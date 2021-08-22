@@ -44,6 +44,7 @@ namespace Test.Jugueteria.Api
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Test.Jugueteria.Api", Version = "v1" });
             });
+            services.AddCors();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -55,6 +56,11 @@ namespace Test.Jugueteria.Api
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("v1/swagger.json", "Test.Jugueteria.Api v1"));
             }
+
+            app.UseCors(core =>
+            core.WithOrigins("*")
+            .AllowAnyHeader()
+            .AllowAnyMethod());
 
             app.UseHttpsRedirection();
 
