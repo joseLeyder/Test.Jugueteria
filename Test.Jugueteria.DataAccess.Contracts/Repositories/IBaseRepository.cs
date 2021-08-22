@@ -13,13 +13,14 @@ namespace Test.Jugueteria.DataAccess.Contracts.Repositories
         Task<T> UpdateAsync(T element);
         Task<bool> DeleteAsync(object id);
         Task<T> GetAsync(object id);
-        Task<IEnumerable<T>> GetAllAsync(int? take = null, int? skip = null);
+        Task<IEnumerable<T>> GetAllAsync(int? page = null, int? rows = null);
         Task<bool> ExistAsync(object id);
-        Task<IEnumerable<T>> GetAllAsync(Expression<Func<T, bool>> whereCondition = null,
-                   Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null,
-                   string includeProperties = "",
-                   int? take = null,
-                   int? skip = null);
+        Task<IEnumerable<T>> GetAllAsync(
+            Expression<Func<T, bool>> whereCondition,
+            Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null,
+            int? take = null,
+            int? skip = null);
         Task<int> GetCountAsync(Expression<Func<T, bool>> whereCondition);
+        Task<T> GetAsync(Expression<Func<T, bool>> whereCondition = null);
     }
 }

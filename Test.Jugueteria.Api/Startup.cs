@@ -13,6 +13,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Test.Jugueteria.DataAccess.Contracts.Context;
+using Test.Jugueteria.DataAccess.Contracts.Repositories;
+using Test.Jugueteria.DataAccess.Repositories;
 
 namespace Test.Jugueteria.Api
 {
@@ -29,8 +31,13 @@ namespace Test.Jugueteria.Api
         public void ConfigureServices(IServiceCollection services)
         {
 
-            services.AddDbContext<JugueteriaDBContext>(options =>
-            options.UseSqlServer(Configuration.GetConnectionString("Database")));
+            services.AddDbContext<JugueteriaDBContext>(options => {
+                options.UseSqlServer(Configuration.GetConnectionString("Database"));
+                options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
+            }
+            );
+
+            services.AddTransient(typeof(IBaseRepository<>), typeof(BaseRepository<>));
 
             services.AddControllers();
             services.AddSwaggerGen(c =>
@@ -46,7 +53,7 @@ namespace Test.Jugueteria.Api
             {
                 app.UseDeveloperExceptionPage();
                 app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Test.Jugueteria.Api v1"));
+                app.UseSwaggerUI(c => c.SwaggerEndpoint("v1/swagger.json", "Test.Jugueteria.Api v1"));
             }
 
             app.UseHttpsRedirection();

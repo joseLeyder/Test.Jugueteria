@@ -10,11 +10,19 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="5.0.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="5.6.3" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Test.Jugueteria.DataAccess.Contracts\Test.Jugueteria.DataAccess.Contracts.csproj" />
+    <ProjectReference Include="..\Test.Jugueteria.DataAccess\Test.Jugueteria.DataAccess.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Mapper\" />
+  </ItemGroup>
+
+  <ProjectExtensions><VisualStudio><UserProperties appsettings_1json__JsonSchema="https://json.schemastore.org/nodehawkrc.json" /></VisualStudio></ProjectExtensions>
 
 </Project>
