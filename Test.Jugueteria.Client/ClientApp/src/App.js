@@ -4,6 +4,7 @@ import { Layout } from './components/Layout';
 import { Home } from './Pages/Home';
 import Productos from './Pages/Productos';
 import ProductoCU from './Pages/ProductoCU';
+import ProductoVer from './Pages/ProductoVer';
 
 import './custom.css'
 
@@ -17,6 +18,7 @@ export default class App extends Component {
         <Route path='/productos' component={Productos} />
         <Route path='/productos-crear' component={ProductoCU} />
         <Route path='/productos-editar/:id' component={ProductoCU} />
+        <Route path='/productos-ver/:id' component={ProductoVer} />
       </Layout>
     );
   }

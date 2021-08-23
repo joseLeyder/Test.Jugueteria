@@ -10,7 +10,9 @@ const model = {
     restriccionEdad: 0,
     precio: 0.0,
     compania: '',
-    descripcion: ''
+    descripcion: '',
+    fotoProducto: null,
+    pathFoto: ''
 }
 
 const modelError = {
@@ -18,11 +20,11 @@ const modelError = {
     restriccionEdad: '',
     precio: '',
     compania: '',
-    descripcion: ''
+    descripcion: '',
+    fotoProducto: ''
 }
 
 class ProductosCU extends Component {
-
     constructor(props) {
         super(props);
         const id = this.props.match.params.id === undefined ? 0 : this.props.match.params.id;
@@ -34,6 +36,8 @@ class ProductosCU extends Component {
         }
     }
 
+
+    //Cuando el componente se monto obtener los campos solo si es para editar
     componentDidMount = async () => {
         let id = this.state.id;
         await this.resetFiels();
@@ -42,6 +46,8 @@ class ProductosCU extends Component {
         }
     }
 
+
+    //Obtener los valores para editar
     getByID = async (id) => {
         this.setState({ loading: true });
         let fields = this.state.fields;
@@ -49,26 +55,18 @@ class ProductosCU extends Component {
             .then(response => {
                 this.resetFiels();
                 fields = response.data;
-                console.log(response.data);
             })
             .catch(e => {
                 console.log(e);
             });
-        //if (fields.idTicket != null) {
-        //    await TicketDataService.getAllFiles(idTicket)
-        //        .then(response => {
-        //            fields.archivos = response.data;
-        //        })
-        //        .catch(e => {
-        //            console.log(e);
-        //        });
-        //}
         this.setState({
             fields: fields,
             loading: false
         });
     }
 
+
+    //Guardar 
     saveSubmit = async (e) => {
         e.preventDefault();
         let errors = this.state.errors;
@@ -81,24 +79,21 @@ class ProductosCU extends Component {
         Object.keys(fields).forEach(key => filedata.append(key, fields[key]));
 
         if (this.state.fields.id === 0) {
-            await ProductosDataService.create(fields)
+            await ProductosDataService.create(filedata)
                 .then(response => {
                     responseData = response.data;
                 })
                 .catch(function (error) {
                     errors = validForm.displayErrors(error.response.data.errors, errors);
-                    console.log(error.response.data.errors);
-                    
                 });
         }
         else {
-            await ProductosDataService.update(fields)
+            await ProductosDataService.update(filedata)
                 .then(response => {
                     responseData = response.data;
                 })
                 .catch(function (error) {
                     errors = validForm.displayErrors(error.response.data.errors, errors);
-                    console.log(error.response.data.errors);
                 });
         }
 
@@ -108,6 +103,14 @@ class ProductosCU extends Component {
         }
     }
 
+    //Para obtener la imagen del servidor
+    getPathFoto() {
+        if (this.state.fields.pathFoto === "" || this.state.fields.pathFoto === null)
+            return "assets/images/users/no-image.jpg";
+        return 'https://localhost:44327/' + this.state.fields.pathFoto;
+    }
+
+    //Reset a los valores por default de los fields
     resetFiels() {
         let fields = Object.assign(model)
         this.setState({ fields: fields });
@@ -121,6 +124,8 @@ class ProductosCU extends Component {
                         <h2>{this.state.id === 0 ? "Nuevo" : "Editar"} registro de productos</h2>
                     </div>
                 </div>
+                <br />
+                <br />
                 <div className="row">
             <form>
                 <div className="panel-body">
@@ -136,8 +141,12 @@ class ProductosCU extends Component {
                                             value={this.state.fields["nombre"] || ""}
                                             onChange={e => {
                                                 let fields = this.state.fields;
-                                                fields["nombre"] = e.target.value;
-                                                this.setState({ fields });
+                                                let errors = this.state.errors;
+                                                errors.nombre = validForm.validChangeInput(fields, "nombre", e, "nombre");
+                                                if (errors.nombre === '')
+                                                    errors.nombre = validForm.ValidChangeInputMaxLengh(e, "nombre", 50);
+                                                fields.nombre = e.target.value;
+                                                this.setState({ fields, errors });
                                             }
                                             }
                                         />
@@ -151,11 +160,17 @@ class ProductosCU extends Component {
                                             className="form-control"
                                             type="number"
                                             step="0.01"
+                                            min="1"
+                                            max="1000"
                                             value={this.state.fields["precio"] || ""}
                                             onChange={e => {
                                                 let fields = this.state.fields;
-                                                fields["precio"] = e.target.value;
-                                                this.setState({ fields });
+                                                let errors = this.state.errors;
+                                                errors.precio = validForm.ValidChangeInputMinValue(e, "precio", 1);
+                                                if (errors.precio === '')
+                                                errors.precio = validForm.ValidChangeInputMaxValue(e, "precio", 1000);
+                                                fields.precio = e.target.value;
+                                                this.setState({ fields, errors });
                                             }
                                             }
                                         />
@@ -171,8 +186,12 @@ class ProductosCU extends Component {
                                             value={this.state.fields["compania"] || ""}
                                             onChange={e => {
                                                 let fields = this.state.fields;
-                                                fields["compania"] = e.target.value;
-                                                this.setState({ fields });
+                                                let errors = this.state.errors;
+                                                errors.compania = validForm.validChangeInput(fields, "compania", e, "compañia");
+                                                if (errors.compania === '')
+                                                    errors.compania = validForm.ValidChangeInputMaxLengh(e, "compañia", 50);
+                                                fields.compania = e.target.value;
+                                                this.setState({ fields, errors });
                                             }
                                             }
                                         />
@@ -185,11 +204,17 @@ class ProductosCU extends Component {
                                         <input
                                             className="form-control"
                                             type="number"
+                                            min="0"
+                                            max="100"
                                             value={this.state.fields["restriccionEdad"] || ""}
                                             onChange={e => {
                                                 let fields = this.state.fields;
-                                                fields["restriccionEdad"] = e.target.value;
-                                                this.setState({ fields });
+                                                let errors = this.state.errors;
+                                                errors.restriccionEdad = validForm.ValidChangeInputMinValue(e, "edad máxima", 0);
+                                                if (errors.restriccionEdad === '')
+                                                    errors.restriccionEdad = validForm.ValidChangeInputMaxValue(e, "edad máxima", 100);
+                                                fields.restriccionEdad = e.target.value;
+                                                this.setState({ fields, errors });
                                             }
                                             }
                                         />
@@ -205,7 +230,9 @@ class ProductosCU extends Component {
                                             value={this.state.fields["descripcion"] || ""}
                                             onChange={e => {
                                                 let fields = this.state.fields;
-                                                fields["descripcion"] = e.target.value;
+                                                let errors = this.state.errors;
+                                                errors.descripcion = validForm.ValidChangeInputMaxLengh(e, "descripción", 100);
+                                                fields.descripcion = e.target.value;
                                                 this.setState({ fields });
                                             }
                                             }
@@ -213,15 +240,48 @@ class ProductosCU extends Component {
                                         <span className="text-danger">{this.state.errors["descripcion"] || ""}</span>
                                     </div>
                                 </div>
+                                <div className="col-md-6">
+                                    <div className="form-group">
+                                        <label className="">Imagen de referencia</label>
+                                        <div className="col-md-6 col-xs-12 no-multiple">
+                                            <input type="file" id="image" accept="image/*"
+                                                onChange={e => {
+                                                    let fields = this.state.fields;
+                                                    fields.fotoProducto = e.target.files[0];
+                                                    this.setState({ fields });
+                                            }} />
+                                            
+                                            <span className="error">{this.state.errors["fotoProducto"] || ''}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="col-md-6">
+                                    <div className="form-group">
+                                        <label>Imagen actual</label>
+                                        <div className="col-md-9">
+                                            <img style={{
+                                                width: "100px", height: "100px" }} src={this.getPathFoto()} />
+                                        </div>
+                                    </div>
+                                </div>
                     </div>
-                </div>
+                        </div>
+                        <hr/>
                 <div className="panel-footer">
                     <button
                         type="button"
                         onClick={(e) => { this.saveSubmit(e); }}
-                        className="btn btn-success pull-right">
-                        <i className="fas fa-check-circle"></i>{" "}
+                        className="btn btn-success">
+                        {" "}
                                                                     Guardar
+                                                        </button>
+                            { "  "}
+                            <button
+                                type="button"
+                                onClick={(e) => { window.location.href = "/productos"; }}
+                                className="btn btn-danger">
+                                {" "}
+                                                                    Cancelar
                                                         </button>
                 </div>
                     </form>

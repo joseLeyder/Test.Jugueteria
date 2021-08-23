@@ -4,7 +4,7 @@ import { useTable, usePagination, useGlobalFilter, useSortBy } from "react-table
 import { render } from 'react-dom';
 
 let classTh = "";
-const TableReactExtends = ({ columns, data, hiddenColumns, handler, pageExtends = 1, pageSizeExtends = 5, totalRows = 0, search = "", placeHolderText="" }) => {
+const TableReactExtends = ({ columns, data, hiddenColumns, handler, pageExtends = 1, pageSizeExtends = 5, totalRows = 0, search = "", handlerForEachRow = "", handlerForEachCell = "", placeHolderText="" }) => {
     const props = useTable(
         {
             columns,
@@ -122,10 +122,15 @@ const TableReactExtends = ({ columns, data, hiddenColumns, handler, pageExtends 
                     <tbody {...getTableBodyProps()}>
                         {page.map((row, i) => {
                             prepareRow(row);
+                            if (handlerForEachRow != "")
+                                row = handlerForEachRow(row)
                             return (
                                 <tr {...row.getRowProps()}>
                                     <td onClick={(e) => { AppendTrChild(e.currentTarget.parentNode, document.querySelector(".TableContainer")) }} className="ExpandButton none"><i className="fa fa-caret-right"></i></td>
                                     {row.cells.map(cell => {
+
+                                        if (handlerForEachCell != "")
+                                            cell = handlerForEachCell(cell)
                                         return (
                                             <td {...cell.getCellProps({ className: cell.column.className })}>{cell.render("Cell")}</td>
                                         );
@@ -136,7 +141,7 @@ const TableReactExtends = ({ columns, data, hiddenColumns, handler, pageExtends 
                     </tbody>
                 </table>
                 <div className="pagination">
-                    <div>
+                    <div style={{ float: "left" }}>
                         <span>
                             Página{" "}
                             <strong>
@@ -144,7 +149,7 @@ const TableReactExtends = ({ columns, data, hiddenColumns, handler, pageExtends 
                             </strong>{" (Mostrando "}{rows.length}{" registros)"}
                         </span>
                     </div>
-                    <div >
+                    <div style={{ float: "right" }}>
                         <button onClick={async (e) => await handler(1, pageSize, search, false)} disabled={!(pageExtends > 1)}>
                             { "<<"}
                         </button>{" "}

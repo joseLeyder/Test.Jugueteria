@@ -87,4 +87,46 @@ export default class ValidForm {
         });
         return errors;
     }
+
+    validChangeInput(fields, field, e, name) {
+        if (fields.hasOwnProperty(field)) {
+            switch (typeof (fields[field])) {
+                case 'number':
+                    if (typeof (e.target.value) === 'string')
+                        return "Ingrese un número valido";
+                    break;
+                case 'string':
+                    if (e.target.value === '')
+                        return `El campo ${name} es obligatorio`;
+                    break;
+                case 'boolean':
+                    if (e.target.value === null)
+                        return "Indique un valor para la condición";
+                    break;
+                default:
+            }
+        }
+        return "";
+    }
+
+    ValidChangeInputMaxLengh(e, name, max) {
+        if (e.target.value.length > max) {
+            return `El número de caracteres para el campo ${name} no debe ser mayor a ${max}`;
+        }
+        return "";
+    }
+
+    ValidChangeInputMaxValue(e, name, max) {
+        if (e.target.value > max) {
+            return `El número para el campo ${name} no debe ser mayor a ${max}`;
+        }
+        return "";
+    }
+
+    ValidChangeInputMinValue(e, name, min) {
+        if (e.target.value < min) {
+            return `El número para el campo ${name} no debe ser menor a ${min}`;
+        }
+        return "";
+    }
 }

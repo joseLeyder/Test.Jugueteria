@@ -2,15 +2,17 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Test.Jugueteria.DataAccess.Contracts.Context;
 
 namespace Test.Jugueteria.DataAccess.Contracts.Migrations
 {
     [DbContext(typeof(JugueteriaDBContext))]
-    partial class JugueteriaDBContextModelSnapshot : ModelSnapshot
+    [Migration("20210822214320_AgregarPathFoto")]
+    partial class AgregarPathFoto
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

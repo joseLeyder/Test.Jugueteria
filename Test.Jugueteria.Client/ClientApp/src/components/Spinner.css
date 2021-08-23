@@ -1,0 +1,52 @@
+﻿.spinner-box {
+    position: absolute;
+    left: 40%;
+    top: 40%;
+    z-index: 99999!important
+}
+.spinner-box-text {
+    color: darkblue !important;
+}
+
+.loading-icon {
+    display: flex;
+    border: 10px solid #f3f3f3; /* Light grey */
+    border-top: 10px solid #3498db; /* Blue */
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    text-align: center;
+    animation-name: spin;
+    animation-duration: 2s;
+    transition-timing-function: linear;
+    animation-iteration-count: infinite;
+    animation: spin 2s linear infinite;
+}
+
+.spinner-box-login > *{
+    margin: 15px 0;
+}
+
+
+.loading-icon div {
+    margin: auto;
+}
+
+@keyframes showReloadButton{
+    0%{
+        display: none
+    }
+    100%{
+        display: block !important
+    }
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}

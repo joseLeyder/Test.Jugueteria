@@ -2,10 +2,12 @@
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Test.Jugueteria.Api.Models;
+using Test.Jugueteria.Api.Utils;
 using Test.Jugueteria.DataAccess.Contracts.Entities;
 using Test.Jugueteria.DataAccess.Contracts.Repositories;
 
@@ -16,6 +18,8 @@ namespace Test.Jugueteria.Api.Controllers
     public class ProductosController : ControllerBase
     {
         private readonly IBaseRepository<Producto> _repository;
+        private IFormFile AuxArchivo;
+        private string AuxPath;
 
         public ProductosController(IBaseRepository<Producto> repository)
         {
@@ -98,10 +102,19 @@ namespace Test.Jugueteria.Api.Controllers
         //POST: api/Cliente
         [HttpPost]
         [ProducesResponseType(typeof(ProductoModel), StatusCodes.Status200OK)]
-        public async Task<IActionResult> Post([FromBody] ProductoModel producto)
+        public async Task<IActionResult> Post([FromForm] ProductoModel producto)
         {
             try
             {
+
+                if (producto.FotoProducto != null)
+                {
+                    AuxArchivo = producto.FotoProducto;
+                    AuxPath = "";
+                }
+
+                string filext = Path.GetExtension(producto.FotoProducto.FileName);
+
                 //var producto = new Producto();
                 var productoEntri = await _repository.AddAsync(new Producto { 
                     Nombre = producto.Nombre,
@@ -110,6 +123,13 @@ namespace Test.Jugueteria.Api.Controllers
                     Precio = producto.Precio,
                     RestriccionEdad = producto.RestriccionEdad
                 });
+
+                await FileCustum.SaveFile(AuxArchivo, "Archivos/Productos/" + productoEntri.Id.ToString() + "/", AuxPath, productoEntri.Id);
+
+                productoEntri.PathFoto = "Archivos/Productos/" + productoEntri.Id.ToString() + "/" + productoEntri.Id + filext;
+
+                productoEntri = await _repository.UpdateAsync(productoEntri);
+
                 return Ok(productoEntri);
             }
             catch (Exception ex)
@@ -122,7 +142,7 @@ namespace Test.Jugueteria.Api.Controllers
         //PUT: api/Cliente
         [HttpPut]
         [ProducesResponseType(typeof(ProductoModel), StatusCodes.Status200OK)]
-        public async Task<IActionResult> Put([FromBody] ProductoModel producto)
+        public async Task<IActionResult> Put([FromForm] ProductoModel producto)
         {
             try
             {
@@ -134,6 +154,16 @@ namespace Test.Jugueteria.Api.Controllers
                     original.RestriccionEdad = producto.RestriccionEdad;
                     original.Compania = producto.Compania;
                     original.Descripcion = producto.Descripcion;
+                    if (producto.FotoProducto != null)
+                    {
+                        string filext = Path.GetExtension(producto.FotoProducto.FileName);
+                        if (Directory.Exists("Archivos/Productos/" + producto.Id.ToString()))
+                            Directory.Delete("Archivos/Productos/" + producto.Id.ToString(),true);
+                        await FileCustum.SaveFile(producto.FotoProducto, "Archivos/Productos/" + producto.Id.ToString() + "/", "", producto.Id);
+
+                        original.PathFoto = "Archivos/Productos/" + producto.Id.ToString() + "/" + producto.Id + filext;
+                    }
+
                     var productoUpd = await _repository.UpdateAsync(original);
                     return Ok(productoUpd);
                 }

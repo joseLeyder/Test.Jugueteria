@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace Test.Jugueteria.Api.Models
@@ -19,5 +20,9 @@ namespace Test.Jugueteria.Api.Models
         [Required(ErrorMessage = "El precio del producto es obligatorio")]
         [Range(1, 1000, ErrorMessage = "El valor para el precio debe ser de {1} a {2}")]
         public decimal Precio { get; set; }
+
+        //Para agregar la foto al servidor
+        public IFormFile FotoProducto { get; set; }
+        public string PathFoto { get; set; }
     }
 }

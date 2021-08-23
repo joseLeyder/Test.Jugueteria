@@ -26,5 +26,6 @@ namespace Test.Jugueteria.DataAccess.Contracts.Entities
         [Range(1, 1000)]
         [Column(TypeName = "decimal(6, 2)")]
         public decimal Precio { get; set; }
+        public string PathFoto { get; set; }
     }
 }

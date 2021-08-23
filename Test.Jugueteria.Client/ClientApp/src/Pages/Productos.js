@@ -1,6 +1,7 @@
 ﻿import React, { Component } from 'react';
 import ProductosDataService from '../Service/Productos.Service'
 import TableReat from '../components/TableReact';
+import Spinner from '../components/Spinner';
 
 
 const model = {
@@ -16,9 +17,10 @@ class Productos extends Component {
     constructor(props) {
         super(props);
 
-        //this.handleClick = this.handleClick.bind(this);
         this.tableHandler = this.tableHandler.bind(this);
+
         this.state = {
+            //Configuracion necesaria para utilizar el componete Table
             tableInfo: {
                 columns: [
                     {
@@ -55,17 +57,11 @@ class Productos extends Component {
                                 accessor: (str) => 'ver',
                                 Cell: (tableProps) => {
                                     return (
-                                                <button
-                                                    className="btn btn-primary ver"
-                                                    data-id={tableProps.row.values.id}
-                                                    onClick={e => {
-                                                        this.props.history.push({
-                                                            pathname: `/productos-ver/${tableProps.row.original.id}`
-                                                        })
-                                                    }}
-                                                    >
-                                                    <i className="fa fa-eye"></i> Ver
-                                                </button>
+                                        <a
+                                            href={`/productos-ver/` + tableProps.row.values.id}
+                                            className="btn btn-primary"
+                                            style={{ width: '100%' }}
+                                        > Ver</a>
                                     )
                                 }
                             },
@@ -75,16 +71,11 @@ class Productos extends Component {
                                 accessor: (str) => 'editar',
                                 Cell: (tableProps) => {
                                     return (
-                                                <button
-                                                    className="btn btn-success atender"
-                                                    data-id={tableProps.row.values.id}
-                                                    onClick={e => {
-                                                        this.props.history.push({
-                                                            pathname: `/productos-editar/${tableProps.row.original.id}`
-                                                        })
-                                                    }}>
-                                                    <i className="fa fa-check"></i> Editar
-                                                </button>
+                                        <a
+                                            href={`/productos-editar/` + tableProps.row.values.id}
+                                            className="btn btn-success editar"
+                                            style={{ width: '100%' }}
+                                        > Editar</a>
                                     )
                                 }
                             },
@@ -96,12 +87,13 @@ class Productos extends Component {
                                     return (
                                                 <button
                                                     data-toggle="modal"
-                                                    data-target="#deletecategoria"
-                                                    className="btn btn-danger"
+                                            data-target="#exampleModal"
+                                            className="btn btn-danger btn-block"
+                                            style={{ width: '100%' }}
                                                     data-id={tableProps.row.values.id}
                                                     onClick={() => { this.handlerDesactivar(tableProps.row.values) }}
                                                 >
-                                                    <i className="fa fa-ban"></i>Eliminar
+                                                    Eliminar
                                                 </button>
                                     )
                                 }
@@ -125,6 +117,8 @@ class Productos extends Component {
         this.getAll(this.state.tableInfo["page"], this.state.tableInfo["rows"], this.state.tableInfo["search"]);
     }
 
+
+    //Handler para actualizar los valores de la tabla
     async tableHandler(page, rows, search, isDelay) {
         let delayAccion = isDelay ? 1500 : 0;
         let tableInfo = this.state.tableInfo;
@@ -140,13 +134,14 @@ class Productos extends Component {
         }.bind(this), delayAccion);
     }
 
+
+    //Obtener todos los registros
     getAll = async (page, rows, search) => {
         this.setState({ loading: true });
         let tableInfo = this.state.tableInfo;
         await ProductosDataService.getAll(search, page, rows)
             .then(response => {
                 tableInfo["data"] = response.data;
-                console.log(response.data);
             }).catch(e => {
                 console.log(e);
             });
@@ -154,7 +149,6 @@ class Productos extends Component {
         await ProductosDataService.getTotalRecords(search)
             .then(response => {
                 tableInfo["totalRows"] = response.data;
-                console.log(response.data);
             })
             .catch(e => {
                 console.log(e);
@@ -166,28 +160,28 @@ class Productos extends Component {
         });
     }
 
-    deleteById = async (id) => {
+    //Eliminar un registro
+    deleteSubmit = async (e) => {
+        e.preventDefault();
         this.setState({ loading: true });
+
         let responseData;
-        await ProductosDataService.delete(id)
+        await ProductosDataService.delete(this.state.productoDelete["id"])
             .then(response => {
                 responseData = response.data;
             })
             .catch(function (error) {
-                console.log(error)
+                console.log(error);
             });
 
         this.setState({ loading: false });
         if (responseData != null) {
-            await this.tableHandler(this.state.tableInfo.page, this.state.tableInfo.rows, this.state.tableInfo.search, false);
-        }
-        if (document.querySelector(".trChild")) {
-            document.querySelectorAll(".trChild").forEach(item => {
-                item.remove();
-            });
+            await this.getAll(this.state.tableInfo.page, this.state.tableInfo.rows, this.state.tableInfo.search);
+            document.querySelector(`#exampleModal button[data-dismiss="modal"]`).click();
         }
     }
 
+    //Obtener la información del producto que se desea eliminar
     handlerDesactivar = (producto) => {
         let desObj = { id: producto.id, nombre: producto.nombre }
         this.setState({
@@ -197,7 +191,29 @@ class Productos extends Component {
 
     render() {
         return (
+            <div>
+                
+                <div className="modal fade" id="exampleModal" tabindex="-1" role="dialog">
+                    <div className="modal-dialog" role="document">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <h5 className="modal-title">Eliminar registro</h5>
+                                <button type="button" className="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div className="modal-body">
+                                <p>¿Deseas eliminar el registro?</p>
+                            </div>
+                            <div className="modal-footer">
+                                <button type="button" className="btn btn-primary" onClick={(e) => { this.deleteSubmit(e) }}>Eliminar</button>
+                                <button type="button" className="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <div className="container">
+                    <Spinner show={this.state.loading} />
                 <div className="row">
                     <div className="col-md-6">
                         <h2>Lista de productos</h2>
@@ -207,7 +223,7 @@ class Productos extends Component {
                             className="btn btn-primary"
                             style={{ width: '100%' }}
                             href="/productos-crear">
-                            <i className="fas fa-plus"></i> Nuevo registro
+                            Nuevo registro
                                                     </a>   
                     </div>
                 </div>
@@ -226,24 +242,10 @@ class Productos extends Component {
                             search={this.state.tableInfo["search"]}
                             />
                     </div>
-                    <div className="modal fade" id="deletecategoria" role="dialog" aria-hidden="true">
-                        <div className="modal-dialog">
-                            <div className="modal-content">
-                                <div className="modal-header">
-                                    <h5 className="modal-title" id="exampleModalLongTitle">{`¿Esta seguro que desea eliminar el registro de ${this.state.productoDelete.nombre}?`}</h5>
-                                    <button type="button" className="close" data-dismiss="modal" aria-label="Close">
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>
-                                </div>
-                                <div className="modal-footer">
-                                    <button id="toDelete" type="button" name="modalDe" className="btn btn-primary" onClick={() => { this.deleteById(this.state.productoDelete.id) }}>Eliminar producto</button>
-                                    <button type="button" className="btn btn-secondary" data-dismiss="modal">Cerrar</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
+               
                 </div>
+            </div>
             )
     }
 }

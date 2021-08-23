@@ -5,11 +5,13 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Test.Jugueteria.DataAccess.Contracts.Context;
@@ -71,6 +73,15 @@ namespace Test.Jugueteria.Api
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+            });
+
+            if (!Directory.Exists(Path.Combine(Directory.GetCurrentDirectory(), "Archivos")))
+                Directory.CreateDirectory(Path.Combine(Directory.GetCurrentDirectory(), "Archivos"));
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                FileProvider = new PhysicalFileProvider(
+                    Path.Combine(Directory.GetCurrentDirectory(), "Archivos")),
+                RequestPath = "/Archivos"
             });
         }
     }
