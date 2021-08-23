@@ -203,7 +203,7 @@ class Productos extends Component {
                                 </button>
                             </div>
                             <div className="modal-body">
-                                <p>¿Deseas eliminar el registro?</p>
+                                <p>{`¿Deseas eliminar el registro ${this.state.productoDelete["nombre"]}?`}</p>
                             </div>
                             <div className="modal-footer">
                                 <button type="button" className="btn btn-primary" onClick={(e) => { this.deleteSubmit(e) }}>Eliminar</button>

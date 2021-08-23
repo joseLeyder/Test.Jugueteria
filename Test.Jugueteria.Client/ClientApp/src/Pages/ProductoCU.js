@@ -242,17 +242,13 @@ class ProductosCU extends Component {
                                 </div>
                                 <div className="col-md-6">
                                     <div className="form-group">
-                                        <label className="">Imagen de referencia</label>
-                                        <div className="col-md-6 col-xs-12 no-multiple">
-                                            <input type="file" id="image" accept="image/*"
+                                        <label>Imagen de referencia</label>
+                                            <input className="form-control" type="file" id="image" accept="image/*"
                                                 onChange={e => {
                                                     let fields = this.state.fields;
                                                     fields.fotoProducto = e.target.files[0];
                                                     this.setState({ fields });
                                             }} />
-                                            
-                                            <span className="error">{this.state.errors["fotoProducto"] || ''}</span>
-                                        </div>
                                     </div>
                                 </div>
                                 <div className="col-md-6">

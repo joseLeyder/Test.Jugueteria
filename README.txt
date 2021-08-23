@@ -13,3 +13,6 @@ Pasos para correr el proyecto
 
 -----------------------------------------------Lado del cliente-----------------------------------------
 
+
+>Abrir la consola de administrador de paquetes paquetes 
+	Ejecutar el comando: cd Test.Jugueteria.Client/ClientApp
